@@ -1,5 +1,7 @@
 package com.api.employeeAPI.model;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,13 +9,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+@CrossOrigin("*")
 @Entity
 @Table(name = "employee")
+
 public class Employee {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int e_id;
+	private Long e_id;
 	@Column(name = "e_name")
 	private String e_name;
 	@Column(name = "e_city")
@@ -21,7 +25,7 @@ public class Employee {
 	@Column(name = "e_salary")
 	private String e_salary;
 
-	public Employee(int e_id, String e_name, String e_city, String e_salary) {
+	public Employee(Long e_id, String e_name, String e_city, String e_salary) {
 		super();
 		this.e_id = e_id;
 		this.e_name = e_name;
@@ -33,11 +37,11 @@ public class Employee {
 		// TODO Auto-generated constructor stub
 	}
 
-	public int getE_id() {
+	public Long getE_id() {
 		return e_id;
 	}
 
-	public void setE_id(int e_id) {
+	public void setE_id(Long e_id) {
 		this.e_id = e_id;
 	}
 

@@ -1,65 +1,66 @@
 package com.api.employeeAPI.controller;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.api.employeeAPI.model.Employee;
-import com.api.employeeAPI.repository.EmployeeRepository;
+import com.api.employeeAPI.dto.EmployeeDto;
+import com.api.employeeAPI.service.EmployeeService;
 
+@CrossOrigin("*")
 @RestController
-//@RequestMapping("/api")
+@RequestMapping("/api/employees")
 public class EmployeeController {
 
-	@Autowired
-	EmployeeRepository employeeRepository;
+	public EmployeeController(EmployeeService employeeService) {
+		this.employeeService = employeeService;
+	}
 
-	@PostMapping("/employee")
-	public String createNewEmployee(@RequestBody Employee employee) {
-		employeeRepository.save(employee);
-		return "Employee created successfully";
+	private EmployeeService employeeService;
+
+	@PostMapping
+	public ResponseEntity<EmployeeDto> createNewEmployee(@RequestBody EmployeeDto employeeDto) {
+		EmployeeDto savedEmployee = employeeService.createNewEmployee(employeeDto);
+		return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
 
 	}
 
-	@GetMapping("/employees")
-	public List<Employee> getAllEmployees() {
-		List<Employee> employees = employeeRepository.findAll();
-		return employees;
+	@GetMapping
+	public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
+		List<EmployeeDto> allEmployees = employeeService.getAllEmployees();
+		// System.out.println("saved user" + allEmployees);
+		return new ResponseEntity<>(allEmployees, HttpStatus.OK);
+
 	}
 
-	@GetMapping("/employees/{e_id}")
-	public Employee getEmployeeById(@PathVariable int e_id) {
-		Employee employee = employeeRepository.findById(e_id).get();
-		return employee;
+	@GetMapping("/{e_id}")
+	public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable Long e_id) {
+		EmployeeDto employeeById = employeeService.getEmployeeById(e_id);
+		return new ResponseEntity<>(employeeById, HttpStatus.OK);
+
 	}
 
-	@PutMapping("/employees/{e_id}")
-	public String updateEmployee(@PathVariable int e_id, @RequestBody Employee employee) {
-		Optional<Employee> emp = employeeRepository.findById(e_id);
-		if (emp.isPresent()) {
-			Employee existEmp = emp.get();
-			existEmp.setE_name(employee.getE_name());
-			existEmp.setE_city(employee.getE_city());
-			existEmp.setE_salary(employee.getE_salary());
-			employeeRepository.save(existEmp);
-			return "Employee Details against id " + e_id + " updated";
-		} else {
-			return "Employee Details does not exist for id " + e_id;
-		}
+	@PutMapping("/{e_id}")
+	public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long e_id,
+			@RequestBody EmployeeDto updatedEmployee) {
+		EmployeeDto employee = employeeService.updateEmployee(e_id, updatedEmployee);
+		return new ResponseEntity<>(employee, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/employees/{e_id}")
-	public String deleteEmployeeById(@PathVariable int e_id) {
-		employeeRepository.deleteById(e_id);
-		return "Employee deleted successfully";
+	@DeleteMapping("/{e_id}")
+	public ResponseEntity<String> deleteEmployeeById(@PathVariable Long e_id) {
+		employeeService.deleteEmployeeById(e_id);
+		return new ResponseEntity<>("Employee record deleted successfully", HttpStatus.OK);
 	}
 
 }
